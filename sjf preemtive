@@ -1,0 +1,107 @@
+#include <stdio.h>
+
+int main(){
+
+ int n, completed = 0, curr_time = 0, pid[10], at[10], bt[10], remt[10],
+
+        ct[10], tat[10], wt[10], st[10], rt[10], i, j;
+
+ double tat_sum = 0, wt_sum = 0;
+
+ printf("Enter no. of processes: ");
+
+ scanf("%d", &n);
+
+ for (i = 0; i < n; i++) {
+
+   pid[i] = i + 1;
+
+   printf("Enter arrival time for process[%d]: ", i + 1);
+
+   scanf("%d", &at[i]);
+
+   printf("Enter burst time for process[%d]: ", i + 1);
+
+   scanf("%d", &bt[i]);
+
+   remt[i] = bt[i];
+
+ }
+
+ while (completed != n) {
+
+   int min = 99999999,
+
+       s = -1;        
+
+   for (i = 0; i < n; i++) {
+
+     if (at[i] <= curr_time && remt[i] > 0 && remt[i] < min) {
+
+       min = remt[i];
+
+       s = i;
+
+     }
+
+   }
+
+   if (s == -1) {
+
+     curr_time++;
+
+     continue;
+
+   }
+
+   if (remt[s] == bt[s])
+
+     st[s] = curr_time;
+
+   remt[s]--;
+
+   if (remt[s] == 0) {
+
+     ct[s] = curr_time + 1;
+
+     tat[s] = ct[s] - at[s];
+
+     tat_sum += tat[s];
+
+     wt[s] = tat[s] - bt[s];
+
+     wt_sum += wt[s];
+
+     rt[s] = st[s] - at[s];
+
+     completed++;
+
+   }
+
+   curr_time++;
+
+ }
+
+ printf("\nP\tAT\tBT\tCT\tTAT\tWT\tRT\n\n");
+
+ for (j = 1; j < n + 1; j++) {
+
+   for (i = 0; i < n; i++) {
+
+     if (pid[i] == j)
+
+       printf("P%d\t%d\t%d\t%d\t%d\t%d\t%d\n", pid[i], at[i], bt[i], ct[i],
+
+              tat[i], wt[i], rt[i]);
+
+   }
+
+ }
+
+ printf("\nAverage TAT: %.2f\n", (tat_sum / n));
+
+ printf("Average WT: %.2f\n", (wt_sum / n));
+
+}
+
+ 

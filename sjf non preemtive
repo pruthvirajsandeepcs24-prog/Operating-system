@@ -1,0 +1,127 @@
+#include<stdio.h>
+
+#include<stdlib.h>
+
+#define max(a,b) ((a>b)? (a):(b))
+
+int main(){
+
+   int a=4,b=6,temp,comp_count=0;
+
+   int sjf[a][b];
+
+   printf("Enter the Process, Arrival Time and Burst Time:\n");
+
+   for(int i=0; i<a; i++){
+
+       for(int j=0; j<3; j++){
+
+           scanf("%d",&sjf[i][j]);
+
+       }
+
+   }
+
+   for(int i=0; i<a-1; i++){
+
+       for(int j=0; j<a-i-1; j++){
+
+           if(sjf[j][1] > sjf[j+1][1]){
+
+               for(int k=0; k<3; k++){
+
+                   temp = sjf[j][k];
+
+                   sjf[j][k] = sjf[j+1][k];
+
+                   sjf[j+1][k] = temp;
+
+               }
+
+           }
+
+       }
+
+   }
+
+   int curr_time =0, is_comp[4] = {0};
+
+   while(comp_count < a){
+
+       int best_index = -1, min_burst = 9999;
+
+ 
+
+       for(int i=0; i<a; i++){
+
+           if(sjf[i][1] <= curr_time && is_comp[i] == 0){
+
+               if(sjf[i][2] < min_burst) {
+
+           min_burst = sjf[i][2];
+
+           best_index = i;
+
+       }
+
+   }
+
+}
+
+if(best_index != -1){
+
+   curr_time += sjf[best_index][2];
+
+           sjf[best_index][3] = curr_time;
+
+ 
+
+           sjf[best_index][4] = sjf[best_index][3] - sjf[best_index][1];
+
+           sjf[best_index][5] = sjf[best_index][4] - sjf[best_index][2];
+
+       is_comp[best_index] = 1;
+
+       comp_count++;
+
+   }
+
+   else{
+
+       curr_time++;
+
+   }
+
+}
+
+printf("Process\tAT\tBT\tCT\tTAT\tWT\n");
+
+   for(int i=0; i<a; i++){
+
+       for(int j=0; j<b; j++){
+
+           printf("%d\t",sjf[i][j]);
+
+       }
+
+       printf("\n");
+
+   }
+
+   int sumTAT =0, sumWT=0;
+
+   for(int i=0; i<a; i++){
+
+       sumTAT += sjf[i][4];
+
+       sumWT += sjf[i][5];
+
+   }
+
+   printf("Average TAT: %2f",(float)sumTAT/a);
+
+   printf("Average WT: %2f",(float)sumWT/a);
+
+}
+
+ 

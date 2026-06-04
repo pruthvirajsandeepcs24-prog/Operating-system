@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <math.h>
+int gcd(int a, int b) {
+   if (b == 0)
+       return a;
+   return gcd(b, a % b);
+}
+int lcm(int a, int b) {
+   return (a * b) / gcd(a, b);
+}
+int main() {
+   int n;
+   printf("Enter number of processes: ");
+   scanf("%d", &n);
+   int Ci[n], Ti[n], remaining[n], original_id[n];
+   for (int i = 0; i < n; i++) {
+       printf("Enter execution time (C%d): ", i + 1);
+       scanf("%d", &Ci[i]);
+       printf("Enter period (T%d): ", i + 1);
+       scanf("%d", &Ti[i]);
+       remaining[i] = 0;
+       original_id[i] = i + 1;
+   }
+   double U = 0;
+   for (int i = 0; i < n; i++) {
+       U += (double)Ci[i] / Ti[i];
+   }
+   double U_bound = n * (pow(2, (double)1/n) - 1);
+   printf("\nCPU Utilization (U) = %.4f\n", U);
+   printf("Utilization Bound (U_bound) = %.4f\n", U_bound);
+   if (U > U_bound) {
+       printf("Not Schedulable under RMS\n");
+       return 0;
+   }
+   printf("Schedulable under RMS\n");
+   int hyperperiod = Ti[0];
+   for (int i = 1; i < n; i++) {
+       hyperperiod = lcm(hyperperiod, Ti[i]);
+   }
+   printf("\nLCM (Hyperperiod) = %d\n", hyperperiod);
+   for (int i = 0; i < n - 1; i++) {
+       for (int j = i + 1; j < n; j++) {
+           if (Ti[i] > Ti[j]) {
+               int temp;
+               temp = Ti[i]; Ti[i] = Ti[j]; Ti[j] = temp;
+               temp = Ci[i]; Ci[i] = Ci[j]; Ci[j] = temp;
+               temp = original_id[i]; original_id[i] = original_id[j]; original_id[j] = temp;
+           }
+       }
+   }
+   printf("\nRMS Table:\n");
+   printf("Process\tExecution Time\tPeriod\n");
+   for (int i = 0; i < n; i++) {
+       printf("P%d\t%d\t\t%d\n", original_id[i], Ci[i], Ti[i]);
+   }
+   int schedule[hyperperiod];
+   for (int t = 0; t < hyperperiod; t++) {
+ 
+       for (int i = 0; i < n; i++) {
+           if (t % Ti[i] == 0) {
+               remaining[i] = Ci[i];
+           }
+       }
+       int selected = -1;
+       for (int i = 0; i < n; i++) {
+           if (remaining[i] > 0) {
+               selected = i;
+               break;
+           }
+       }
+       if (selected != -1) {
+           schedule[t] = original_id[selected];
+           remaining[selected]--;
+       } else {
+           schedule[t] = 0;
+       }
+   }
+   printf("\nTimeline (Intervals):\n");
+   int start = 0;
+   for (int t = 1; t <= hyperperiod; t++) {
+       if (t == hyperperiod || schedule[t] != schedule[start]) {
+           if (schedule[start] == 0)
+               printf("Time %d to %d: Idle\n", start, t);
+           else
+               printf("Time %d to %d: P%d\n", start, t, schedule[start]);
+           start = t;
+       }
+   }
+   return 0;
+}

@@ -1,0 +1,64 @@
+#include <stdio.h>
+int main() {
+   int n, r;
+   printf("Enter the number of processes: ");
+   scanf("%d", &n);
+   printf("Enter the number of resources: ");
+   scanf("%d", &r);
+   int alloc[n][r], request[n][r], avail[r], safeSeq[n];
+   int finish[n];
+   printf("Enter the allocation matrix:\n");
+   for (int i = 0; i < n; i++) {
+       printf("Process %d: ", i);
+       for (int j = 0; j < r; j++) {
+           scanf("%d", &alloc[i][j]);
+       }
+   }
+   printf("Enter the request matrix:\n");
+   for (int i = 0; i < n; i++) {
+       printf("Process %d: ", i);
+       for (int j = 0; j < r; j++) {
+           scanf("%d", &request[i][j]);
+       }
+   }
+   printf("Enter the available resources: ");
+   for (int i = 0; i < r; i++) {
+       scanf("%d", &avail[i]);
+   }
+   for (int i = 0; i < n; i++) {
+       finish[i] = 0;
+   }
+   int count = 0;
+   while (count < n) {
+       int found = 0;
+       for (int p = 0; p < n; p++) {
+           if (finish[p] == 0) {
+               int j;
+               for (j = 0; j < r; j++) {
+                   if (request[p][j] > avail[j])
+                       break;
+               }
+               if (j == r) {
+                   for (int k = 0; k < r; k++) {
+                       avail[k] += alloc[p][k];
+                   }
+                   safeSeq[count++] = p;
+                   finish[p] = 1;
+                   found = 1;
+               }
+           }
+       }
+       if (found == 0) {
+           printf("\nSystem is not in a safe state.\n");
+           return 0;
+       }
+   }
+   printf("System is in safe state.\n");
+   printf("Safe Sequence is: ");
+   for (int i = 0; i < n; i++) {
+       printf("P%d", safeSeq[i]);
+       if (i != n - 1) printf(" ");
+   }
+   printf("\n");
+   return 0;
+}
